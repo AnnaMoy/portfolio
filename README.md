@@ -5,4 +5,4 @@
 
 
 ## Tableau Visualization
-*  **Supermarket Sales** - In this project, I used the dataset from [Kaggle] (https://www.kaggle.com/datasets/aungpyaeap/supermarket-sales) to analyze the data to find out the quantity and total cost by product line. Please view the data visualization [here](https://public.tableau.com/app/profile/anna.moy/viz/Supermarketsales_17023132474040/Dashboard1#1).
+*  **Supermarket Sales** - In this project, I used the dataset from [Kaggle](https://www.kaggle.com/datasets/aungpyaeap/supermarket-sales) to analyze the data to find out the quantity and total cost by product line. Please view the data visualization [here](https://public.tableau.com/app/profile/anna.moy/viz/Supermarketsales_17023132474040/Dashboard1#1).
