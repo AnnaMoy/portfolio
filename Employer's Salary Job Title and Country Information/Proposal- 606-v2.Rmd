@@ -1,5 +1,5 @@
 ---
-title: "DATA 606 Data Project Proposal"
+title: 
 author: "Anna Moy"
 output:
   pdf_document: default
