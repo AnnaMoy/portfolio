@@ -3,7 +3,7 @@
 Repository containing portfolio of data science projects completed by me through academic projects and self-learning. 
 
 ## Statistical Analysis
-* **Employer's Salary, Job Title and Country information(https://www.kaggle.com/datasets/amirmahdiabbootalebi/salary-by-job-title-and-country)** - Conduct statistical analysis and determine if there is a relationship between the salary and gender, years of experience and education?
+* **[Employer's Salary, Job Title and Country information](https://www.kaggle.com/datasets/amirmahdiabbootalebi/salary-by-job-title-and-country)** - Conduct statistical analysis and determine if there is a relationship between the salary and gender, years of experience and education?
 
 ## SQL Project
 * **Latest Data Science Salaries** -   In this project, I used the dataset from [Kaggle](https://www.kaggle.com/datasets/iamsouravbanerjee/data-science-salaries-2023?select=v2_Latest_Data_Science_Salaries.csv) to analyze the data to find the salary information for each location. Please feel free to review the [SQL](https://github.com/AnnaMoy/portfolio/blob/main/Query_Datascience_salaries.sql). 
