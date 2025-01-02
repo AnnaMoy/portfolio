@@ -1,0 +1,318 @@
+---
+title: "DATA 606 Data Project Proposal"
+author: "Anna Moy"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+### Data Preparation
+
+```{r data-preparation, message = FALSE}
+# load data
+library(tidyverse)
+library(psych)
+library(infer)
+library(openintro)
+library(ggplot2)
+```
+```{r load-data, message = FALSE}
+# read the csv file
+salary <- read_csv("/Users/zhianna/Desktop/School/Data606/Salary_Data.csv")
+
+dim(salary)
+```
+```{r tidy up}
+# Tidying up the data
+# renaming the column names
+colnames(salary) <- c("age", "gender", "education", "job_title", "yrs_experience", "salary")
+
+# remove missing data
+salary <- salary %>%
+  drop_na()
+
+#add grouping years of experience
+salary <- salary %>%
+  mutate(yrs = case_when(yrs_experience <=  5 ~"0-5",
+                         yrs_experience >  5 & yrs_experience <= 10 ~ "6-10",
+                         yrs_experience > 10 & yrs_experience <= 15 ~ "11-15",
+                         yrs_experience > 15 & yrs_experience <= 20 ~ "16-20",
+                         yrs_experience > 20 ~ "20+"))
+
+# order for the charts
+salary <- salary %>%
+  mutate(yrs = fct_relevel(yrs,"0-5","6-10","11-15","16-20","20+"))
+
+# grouping for education into buckets
+salary$degree<-ifelse(grepl("Bachelor's*", salary$education, ignore.case= TRUE), "Bachelor",
+                ifelse(grepl("Master's*", salary$education, ignore.case= TRUE), "Master",
+                ifelse(grepl("phd", salary$education, ignore.case= TRUE), "PhD",      
+                ifelse(grepl("*High School", salary$education, ignore.case= TRUE),"High School","other"))))
+
+#order for the charts
+salary <- salary %>%
+  mutate(degree = fct_relevel(degree, "High School", "Bachelor", "Master", "PhD"))
+
+salary <- salary %>%
+  mutate(range = case_when(age <=  29 ~"20-29",
+                         age >  29 & yrs_experience <= 39 ~ "30-39",
+                         age > 39 & yrs_experience <= 49 ~ "40-49",
+                         age > 49 & yrs_experience <= 59 ~ "50-59",
+                         age >59  ~ "60+"))
+# order for the charts
+salary <- salary %>%
+  mutate(range = fct_relevel(yrs,"20-29","30-39","40-49","50-59","60+"))
+
+salary
+
+```
+
+### Research question 
+
+**You should phrase your research question in a way that matches up with the scope of inference your dataset allows for.**
+
+Is there a relationship between salary and gender, years of experience, age and education?
+
+### Cases 
+
+**What are the cases, and how many are there?**
+
+Each case represents a worker's demographic data and their employment information .  There are 6704 observations in the dataset.
+
+### Data collection 
+
+**Describe the method of data collection.**
+
+The data was collected through different industries and regions across the globe. It was sourced through employment websites and surveys. The data contains information about age, gender, education, job titles, years of experience, salary, race and geographic location. 
+ 
+
+### Type of study 
+
+**What type of study is this (observational/experiment)?**
+
+This information was received through observational. 
+
+### Data Source 
+
+**If you collected the data, state self-collected. If not, provide a citation/link.**
+
+Data was collected by Kaggle: [Salary by Job Title and Country](https://www.kaggle.com/datasets/amirmahdiabbootalebi/salary-by-job-title-and-country).
+
+### Dependent Variable
+
+**What is the response variable? Is it quantitative or qualitative?**
+
+The response variable is salary which is quantitative and numeric.
+
+### Independent Variable(s)
+
+The explanatory variable are :
+  
+  - Gender   (qualitative and categorical)
+  
+  - Education (qualitative and categorical)
+  
+  - Years of experience (quantitative and numeric)
+  
+  - Age (quantitative and numeric)
+
+### Relevant summary statistics 
+
+**Provide summary statistics for each the variables. Also include appropriate visualizations related to your research question (e.g. scatter plot, boxplots, etc). This step requires the use of R, hence a code chunk is provided below. Insert more code chunks as needed.**
+
+```{r summary-statistics}
+##filter for only female and male (ignoring Others)
+gender <- salary %>%
+  filter(gender == "Female" | gender == "Male")
+gender
+```
+Salary for Female and Male
+```{r salary-female-and-male}
+#observe the salary difference in mean between male and female 
+diff_mean <- gender %>%
+  group_by(gender) %>%
+  summarize(mean_salary = mean(salary)) %>%
+  pull() %>%
+  diff()
+diff_mean
+
+#average salary for female and male only
+avg <- gender %>%
+  summarize(mean = mean(salary))
+avg
+
+
+# filter for female only
+female <- gender %>%
+  filter(gender == "Female") %>%
+  select(salary)
+
+# SD and mean for female
+sdfm <- sd(gender$salary)
+meanfm <- mean(gender$salary)
+
+# plot to see if it looks like a normal distribution
+ggplot(data = female, aes(x = salary)) + geom_blank() +
+  geom_histogram(aes(y = ..density..)) +
+  stat_function(fun = dnorm, args = c(mean = meanfm, sd = sdfm), col = "tomato") +
+  xlab("Female Salaries")
+
+#filter for male only
+male <- gender %>%
+  filter(gender == "Male")
+
+#SD and mean for male
+sdm <- sd(gender$salary)
+meanm <- mean(gender$salary)
+
+#Plot to see if it looks like a normal distribution
+ggplot(data = male, aes(x = salary)) + geom_blank() +
+  geom_histogram(aes(y = ..density..)) +
+  stat_function(fun = dnorm, args = c(mean = meanm, sd = sdm), col = "tomato") + 
+  xlab("Male salaries")
+
+#qqplot for female and male
+qqnormsim(sample = salary, data = female)
+qqnormsim(sample = salary, data = male)
+```
+```{r boxplot}
+# avg of gender
+box <- gender %>%
+  group_by(gender) %>%
+  summarize(mean = round(mean(salary)))
+box
+
+# boxplot data
+text <- gender %>%
+  group_by(gender) %>%
+  summarize(median = round(median(salary)), mean = round(mean(salary)), min = min(salary), max = max(salary), q1 = quantile(salary, .25), q3 = quantile(salary, .75), iqr = q3-q1)
+text
+
+text$labs = c()
+
+#boxplot
+ggplot(gender, aes(gender, salary)) +
+ geom_boxplot() +
+ geom_point(data = box, aes(gender, y = mean),color ="blue", size = 4) +
+ geom_text(data = text, aes(gender, y = median, label = median, vjust = -2)) +
+ geom_text(data = text, aes(gender, y = max, label = max, vjust = -.5)) +
+ geom_text(data = text, aes(gender, y = min, label = min, vjust = -.1)) +
+ geom_text(data = text, aes(gender, y = q1, label = q1, vjust = -.3)) +
+ geom_text(data = text, aes(gender, y = mean, label = mean, vjust = -.3)) +
+ geom_text(data = text, aes(gender, y = q3, label = q3, vjust = -.5)) 
+ 
+
+#density plot
+ggplot(gender, aes(x=salary, color = gender)) + 
+  geom_density()
+#Filter for female
+sum <- gender %>%
+  filter(gender == "Female") %>%
+  summarize(total = median(salary))
+sum
+
+#quartile for 25% and 75%
+q1 <- quantile(sum$total, .25)
+q3 <- quantile(sum$total, .75)
+iqr <- q3 - q1
+
+
+# filter for male
+sum2 <- gender %>%
+  filter(gender == "Male") %>%
+  summarize(total = median(salary))
+sum2
+
+#quartile for 25% and 75%
+q12 <- quantile(sum$total, .25)
+q32 <- quantile(sum$total, .75)
+iqr2 <- q3 - q1
+
+
+```
+Years of Experience and Salary Analysis
+```{r more analysis}
+#group years of experience
+gender %>%
+  group_by(yrs) %>%
+  summarize( x_bar =mean(salary),sd =sd(salary),n=n())
+
+#plot the data points
+ggplot(gender, aes(x = salary, y = yrs_experience)) +
+  geom_point() +
+  geom_smooth(method ="lm", formula= y ~x, color = "darkgreen", se = FALSE)
+
+#bar chart for salary and years of experience
+ggplot(gender, aes(yrs, salary)) +
+  geom_bar(stat = "identity")
+
+# correlation for salary and experience
+cor(gender$salary, gender$yrs_experience)
+
+ex_lm <- lm(salary~yrs_experience, data = gender)
+summary(ex_lm)
+
+```
+
+Education and Salary Analysis
+```{r education}
+gender %>%
+  group_by(degree) %>%
+  summarize( x_bar =mean(salary),sd =sd(salary),n=n())
+
+# Mean for each degree
+deg_mean <- gender %>%
+  group_by(degree) %>%
+  summarize(mean=mean(salary))
+deg_mean
+
+# plot boxplot for degree and salary with mean
+ggplot(gender, aes(degree, salary)) +
+  geom_boxplot() +
+  geom_point(data = deg_mean, aes(degree, y = mean), color ="blue", size = 2)
+
+
+#Anova for degree and salary
+degree_aov <- aov(salary ~ degree, data = gender)
+degree_aov
+summary(degree_aov)
+```
+
+Age and Salary Analysis
+```{r age}
+gender %>%
+  summarize( x_bar =mean(salary),sd =sd(salary),n=n())
+
+# average for each age in salary
+age_mean <- gender %>%
+  summarize(mean=mean(salary))
+age_mean
+
+# scatter plot for age and salary
+ggplot(gender, aes(x=age, salary)) + 
+  geom_point() +
+  geom_smooth(method ="lm", formula= y ~x, color = "red", se = FALSE)
+
+# correlation for salary and age
+cor(gender$salary, gender$age)
+
+age_lm <- lm(salary ~ age, data = gender)
+summary(age_lm)
+
+```
+```{r plot}
+library(ggplot2)
+library(GGally)
+
+plot <- gender %>%
+  select(salary, gender, yrs_experience, education)
+
+ggpairs(plot)
+```
+
+```{r multiple-regression}
+lm_out <- lm(salary ~ gender + yrs_experience + degree, data = gender)
+summary(lm_out)
+
+```
