@@ -5,6 +5,10 @@ Repository containing portfolio of data science projects completed by me through
 ## Statistical Analysis
 * **[Employer's Salary, Job Title and Country information](https://www.kaggle.com/datasets/amirmahdiabbootalebi/salary-by-job-title-and-country)** - Conduct [multi-regression analysis using r](https://rpubs.com/annamoy/1260549) and determine if there is a relationship between the salary and gender, years of experience and education? Results indicate there is sufficient evidence to support there is a relationship between the salary, years of exeprience, education level and gender. 
 
+## Python 
+* **[World Population](https://www.kaggle.com/datasets/iamsouravbanerjee/world-population-dataset?select=world_population.csv)** - Conducted exploratory data, data wrangling and data visualization on the World Population dataset in Python
+
+
 ## SQL Project
 * **Latest Data Science Salaries** -   In this project, I used the dataset from [Kaggle](https://www.kaggle.com/datasets/iamsouravbanerjee/data-science-salaries-2023?select=v2_Latest_Data_Science_Salaries.csv) to analyze the data to find the salary information for each location. Please feel free to review the [SQL](https://github.com/AnnaMoy/portfolio/blob/main/Query_Datascience_salaries.sql). 
 
